@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">MyMateLocation</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="map_item_menu">Карта</string>
+    <string name="groups_item_menu">Группы</string>
+    <string name="search_item_menu">Поиск</string>
+    <string name="profile_item_menu">Профиль</string>
+    <string name="settings_item_menu">Настройки</string>
+
+
 </resources>
