@@ -6,24 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".ui.activities.MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        app:menu="@menu/toolbar_menu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <fragment
         android:id="@+id/fragmentContainerView"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintTop_toBottomOf="parent"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph"/>
 
@@ -32,9 +23,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:labelVisibilityMode="selected"
+        android:layout_margin="8dp"
+        android:background="@drawable/shape_bottom_nav_rounded"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:itemIconTint="@drawable/bottom_menu_item_color"
+        app:itemTextColor="@drawable/bottom_menu_item_color"
         app:menu="@menu/bottom_nav_menu"/>
 
 

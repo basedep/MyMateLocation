@@ -11,13 +11,10 @@ import vaid.project.R
 
 class MainActivity : AppCompatActivity() {
 
-    private var toolbar: Toolbar? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        toolbar = findViewById(R.id.toolbar)
 
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         val navigationController = findNavController(R.id.fragmentContainerView)

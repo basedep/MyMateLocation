@@ -113,6 +113,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun stopLocationService() {
+        Intent(context, LocationService::class.java).apply {
+            action = LocationService.ACTION_STOP
+            activity?.startService(this)
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         mapView?.onStart()
@@ -132,13 +139,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         mapView?.onDestroy()
         stopLocationService()
-    }
-
-    private fun stopLocationService() {
-        Intent(context, LocationService::class.java).apply {
-            action = LocationService.ACTION_STOP
-            activity?.startService(this)
-        }
     }
 
     override fun onLowMemory() {
