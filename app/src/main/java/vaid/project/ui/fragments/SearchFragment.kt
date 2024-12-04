@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import vaid.project.R
 
-class SearchFragment : Fragment() {
+class SearchFragment : BaseFragment() {
+
+    override var bottomNavigationVisibility: Int = View.VISIBLE
 
 
     override fun onCreateView(

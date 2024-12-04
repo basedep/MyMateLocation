@@ -15,8 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,27 +25,29 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import vaid.project.R
-import vaid.project.location.DefaultLocationClient
 import vaid.project.location.LocationService
+import vaid.project.model.User
+import vaid.project.ui.activities.MainActivity
 import vaid.project.utils.Result
+import vaid.project.utils.SessionUtil
 import vaid.project.viewmodels.LocationViewModel
-import vaid.project.viewmodels.LocationViewModelFactory
 
 
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : BaseFragment(), OnMapReadyCallback {
+
+    override var bottomNavigationVisibility: Int = View.VISIBLE
 
     private var map: GoogleMap? = null
     private var mapView: MapView? = null
     private var locationProviderClient: FusedLocationProviderClient? = null
     private var currentMarker: Marker? = null
 
-    private val viewModel: LocationViewModel by viewModels {
-        LocationViewModelFactory(DefaultLocationClient(requireContext(),
-                                LocationServices.getFusedLocationProviderClient(requireContext())))
-    }
+    private var viewModel: LocationViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_map, container, false)
+
+        viewModel = (activity as MainActivity).viewModel
 
         isGPSEnable()
 
@@ -80,11 +80,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map?.isMyLocationEnabled = true
         map?.uiSettings?.isZoomControlsEnabled = true
 
-        viewModel.location.observe(viewLifecycleOwner) { result ->
+        viewModel?.location?.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
-                        updateMapLocation(result.data)
+                    updateMapLocation(result.data)
+
+                    val session = SessionUtil(requireContext()).getPreference("userId")
+                    if (session.isNotEmpty())
+                        viewModel?.updateUserLocation(
+                            session, User(name = null,  latitude = result.data.latitude, longitude = result.data.longitude, groupsIDS = null)
+                        )
                 }
+
                 is Result.Error -> {
                     Toast.makeText(context, result.exception.error, Toast.LENGTH_SHORT).show()
                     Log.d("myLog", "onMapReady: ${result.exception.error}")
@@ -109,6 +116,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             map?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         } else {
             currentMarker?.position = latLng
+            map?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
             map?.animateCamera(CameraUpdateFactory.newLatLng(latLng))
         }
     }
