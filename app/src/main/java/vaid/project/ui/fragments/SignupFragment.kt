@@ -1,18 +1,16 @@
 package vaid.project.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import vaid.project.R
 import vaid.project.ui.activities.MainActivity
@@ -23,10 +21,9 @@ class SignupFragment : BaseFragment() {
 
     override var bottomNavigationVisibility: Int = View.GONE
 
-
-    private var name: EditText? = null
-    private var email: EditText? = null
-    private var password: EditText? = null
+    private var name: TextInputEditText? = null
+    private var email: TextInputEditText? = null
+    private var password: TextInputEditText? = null
     private var signUpButton: Button? = null
     private var progressBar: ProgressBar? = null
     private lateinit var viewModel: LocationViewModel

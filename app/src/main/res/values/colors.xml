@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bottom_nav_icon_color_selected">#2196F3</color>
     <color name="bottom_nav_icon_color_default">#B50377AC</color>
+    <color name="semi_gray">#B3B3B3</color>
+    <color name="transparent">#00000000</color>
 </resources>

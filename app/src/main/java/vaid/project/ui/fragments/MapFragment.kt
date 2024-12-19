@@ -88,7 +88,7 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
                     val session = SessionUtil(requireContext()).getPreference("userId")
                     if (session.isNotEmpty())
                         viewModel?.updateUserLocation(
-                            session, User(name = null,  latitude = result.data.latitude, longitude = result.data.longitude, groupsIDS = null)
+                            session, User(name = null,  latitude = result.data.latitude, longitude = result.data.longitude, groupsIDs = null)
                         )
                 }
 

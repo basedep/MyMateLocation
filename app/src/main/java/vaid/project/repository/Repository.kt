@@ -1,16 +1,15 @@
 package vaid.project.repository
 
-import android.util.Log
+import io.appwrite.Query
+import io.appwrite.models.Document
 import io.appwrite.models.Session
 import vaid.project.database.remote.Appwrite
 import vaid.project.database.remote.AppwriteAPI
-import vaid.project.location.LocationClient
 import vaid.project.model.Groups
 import vaid.project.model.User
 import vaid.project.utils.Constants.COLLECTION_GROUPS
 import vaid.project.utils.Constants.COLLECTION_USERS
 import vaid.project.utils.Constants.DATABASE_ID
-import vaid.project.utils.Result
 import java.util.UUID
 
 class Repository : AppwriteAPI {
@@ -37,6 +36,7 @@ class Repository : AppwriteAPI {
         appwriteDatabase.createDocument(DATABASE_ID, COLLECTION_GROUPS, id, group)
     }
 
+
     override suspend fun getUser(): Map<String, String> {
         val credentials = appwriteAccount.get()
         return mapOf(
@@ -48,5 +48,24 @@ class Repository : AppwriteAPI {
     override suspend fun deleteSession(sessionId: String) {
         appwriteAccount.deleteSession(sessionId)
     }
+
+    override suspend fun getAllUsers(): List<Document<Map<String, Any>>> {
+        return appwriteDatabase.listDocuments(DATABASE_ID, COLLECTION_USERS).documents
+    }
+
+    override suspend fun addUserToGroup(groupId: String, userId: String) {
+        appwriteDatabase.updateDocument(DATABASE_ID, COLLECTION_GROUPS, groupId, listOf("groupUsers" to userId))
+    }
+
+    override suspend fun getAllGroups(userId: String): List<Document<Map<String, Any>>> {
+        return appwriteDatabase.listDocuments(DATABASE_ID, COLLECTION_GROUPS,
+            queries = listOf(Query.search("userID", userId))).documents
+    }
+
+    override suspend fun getAllGroupsUsers(ids: List<String>): List<Document<Map<String, Any>>> {
+        return appwriteDatabase.listDocuments(DATABASE_ID, COLLECTION_USERS,
+            queries = listOf(Query.equal( "id", ids))).documents
+    }
+
 
 }

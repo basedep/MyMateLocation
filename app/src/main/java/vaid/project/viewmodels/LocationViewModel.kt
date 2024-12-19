@@ -5,13 +5,14 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.appwrite.ID
+import com.google.gson.Gson
+import io.appwrite.models.Document
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import vaid.project.location.DefaultLocationClient
 import vaid.project.model.Groups
+import vaid.project.model.ParentItem
 import vaid.project.model.User
 import vaid.project.repository.Repository
 import vaid.project.utils.Result
@@ -23,6 +24,8 @@ class LocationViewModel(
 ) : ViewModel() {
 
     var location: MutableLiveData<Result<Location>> = MutableLiveData<Result<Location>>()
+    var users: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
+    var parentItems: MutableLiveData<List<ParentItem>> = MutableLiveData<List<ParentItem>>()
 
     init {
         getCurrentLocation()
@@ -39,11 +42,12 @@ class LocationViewModel(
     fun signup(name: String, email: String, password: String) = viewModelScope.launch {
         try {
             val id = UUID.randomUUID().toString()
-            val user = User(name, 0.0, 0.0, null)
+            val groupId = UUID.randomUUID().toString()
+            val user = User(id, name, 0.0, 0.0, listOf(groupId))
             val group = Groups(id, null, "Users")
             repository.signup(id, name, email, password)
             repository.addUser(user, id)
-            repository.addGroup(group, ID.unique())
+            repository.addGroup(group, groupId)
         } catch (e: Exception) {
             Log.d("vaid", "signup: $e")
             this.cancel()
@@ -67,4 +71,71 @@ class LocationViewModel(
         repository.deleteSession(sessionId)
     }
 
+    fun getAllUsers(userId: String) = viewModelScope.launch{
+        val allUsers = extractData(repository.getAllUsers()).filterNot {
+            it.id == userId
+        }
+        users.postValue(allUsers)
+    }
+
+    fun addGroup(groupId: String, group: Groups) = viewModelScope.launch{
+        repository.addGroup(group, groupId)
+    }
+
+
+    fun getAllGroups(userId: String) = viewModelScope.launch{
+        val groups = extractDataFromGroups(repository.getAllGroups(userId))
+        val items: MutableList<ParentItem> = mutableListOf()
+
+        for (group in groups){
+            val userIds = group.groupUsers?.map {
+                it
+            }
+            print(userIds)
+            val groupUsers =
+                if (!userIds.isNullOrEmpty())
+                     extractData(repository.getAllGroupsUsers(userIds))
+                else
+                    listOf()
+
+            val groupName = group.groupName
+            items.add(ParentItem(groupName, groupUsers))
+        }
+
+        parentItems.postValue(items)
+    }
+
+
+    private fun extractData(documents: List<Document<Map<String, Any>>>): List<User> {
+        val gson = Gson()
+        val dataList = mutableListOf<User>()
+
+        for (document in documents) {
+            val dataMap: Map<String, Any> = document.toMap()
+            val json = gson.toJson(dataMap["data"])
+
+            val data: User = gson.fromJson(json, User::class.java)
+
+            dataList.add(data)
+        }
+
+        return dataList
+    }
+
+
+    private fun extractDataFromGroups(documents: List<Document<Map<String, Any>>>): List<Groups> {
+        val gson = Gson()
+        val dataList = mutableListOf<Groups>()
+
+        for (document in documents) {
+            val dataMap: Map<String, Any> = document.toMap()
+            val json = gson.toJson(dataMap["data"])
+
+            val data: Groups = gson.fromJson(json, Groups::class.java)
+
+            dataList.add(data)
+        }
+
+        return dataList
+    }
 }

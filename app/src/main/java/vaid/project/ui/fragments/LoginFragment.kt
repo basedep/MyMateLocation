@@ -1,9 +1,9 @@
 package vaid.project.ui.fragments
 
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.util.Patterns
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +12,8 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import io.appwrite.extensions.toJson
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import vaid.project.R
 import vaid.project.ui.activities.MainActivity
@@ -26,11 +25,12 @@ class LoginFragment : BaseFragment() {
 
     override var bottomNavigationVisibility: Int = View.GONE
 
-    private var email: EditText? = null
-    private var password: EditText? = null
+    private var email: TextInputEditText? = null
+    private var password: TextInputEditText? = null
     private var loginButton: Button? = null
     private var progressBar: ProgressBar? = null
     private lateinit var viewModel: LocationViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,7 +77,6 @@ class LoginFragment : BaseFragment() {
             }
         }
     }
-
 
     private fun enableFields(enable: Boolean){
         loginButton?.isEnabled = enable

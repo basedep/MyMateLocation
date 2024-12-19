@@ -3,6 +3,28 @@
     <style name="Base.Theme.MyMateLocation" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+        <item name="searchViewStyle">@style/SearchViewStyle</item>
+        <!--SearchView query text color-->
+        <item name="android:textColorPrimary">@color/white</item>
+        <!--SearchView query hint text color-->
+        <item name="android:textColorHint">@color/white</item>
+
+    </style>
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:background">@drawable/shape_toolbar_rounded</item>
+        <item name="android:backgroundTint">@color/semi_gray</item>
+        <item name="searchIcon">@drawable/search_24</item>
+        <item name="closeIcon">@drawable/close_24</item>
+        <item name="iconifiedByDefault">false</item>
+        <item name="hintEnabled">true</item>
+        <item name="defaultQueryHint">Поиск...</item>
+        <!--remove search bottom line -->
+        <item name="queryBackground">@color/transparent</item>
     </style>
 
     <style name="Theme.MyMateLocation" parent="Base.Theme.MyMateLocation" />

@@ -1,8 +1,9 @@
 package vaid.project.model
 
 data class User(
+    val id: String? = null,
     val name: String?,
     val latitude: Double,
     val longitude: Double,
-    val groupsIDS: List<String>?
+    val groupsIDs: List<String>?
 )
