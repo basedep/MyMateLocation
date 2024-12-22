@@ -13,17 +13,24 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.launch
 import vaid.project.R
 import vaid.project.location.LocationService
 import vaid.project.model.User
@@ -41,6 +48,8 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
     private var locationProviderClient: FusedLocationProviderClient? = null
     private var currentMarker: Marker? = null
+    private var toolbar: Toolbar? = null
+    private var spinner: Spinner? = null
 
     private var viewModel: LocationViewModel? = null
 
@@ -48,6 +57,9 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
         viewModel = (activity as MainActivity).viewModel
+        toolbar = view.findViewById(R.id.toolbar)
+        spinner =  view.findViewById(R.id.group_spinner)
+        viewModel?.getAllGroups(SessionUtil(requireContext()).getPreference("userId"))
 
         isGPSEnable()
 
@@ -65,6 +77,65 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
             mapView?.getMapAsync(this)
         }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val options = arrayListOf<String>()
+
+        viewModel?.parentItems?.observe(viewLifecycleOwner) { groups ->
+
+            options.clear()
+            for (group in groups) {
+                options.add(group.title)
+            }
+
+            val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item, options)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner?.adapter = adapter
+
+            spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    val selectedItem = parent.getItemAtPosition(position).toString()
+                    lifecycleScope.launch {
+                        try {
+                            val groupUsers = viewModel?.getGroupUsers(
+                                selectedItem,
+                                SessionUtil(requireContext()).getPreference("userId")
+                            )?.await()
+
+                            val currentMarkerPosition = currentMarker?.position
+
+                            map?.clear()
+
+                            groupUsers?.forEach { user ->
+                                addMarkerForUser (user, user.latitude, user.longitude)
+                            }
+
+                            currentMarkerPosition?.let { position ->
+                                currentMarker = map?.addMarker(MarkerOptions().position(position))
+                            }
+                        }catch (e: Exception){
+                            Toast.makeText(requireContext(), "Нет пользователей в данной группе", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {
+
+                }
+            }
+        }
+    }
+
+    private fun addMarkerForUser (user: User, latitude: Double, longitude: Double) {
+        val latLng = LatLng(latitude, longitude)
+        val markerOptions = MarkerOptions()
+            .position(latLng)
+            .title(user.name)
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+        map?.addMarker(markerOptions)
     }
 
     private fun startLocationService() {
@@ -91,7 +162,6 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
                             session, User(name = null,  latitude = result.data.latitude, longitude = result.data.longitude, groupsIDs = null)
                         )
                 }
-
                 is Result.Error -> {
                     Toast.makeText(context, result.exception.error, Toast.LENGTH_SHORT).show()
                     Log.d("myLog", "onMapReady: ${result.exception.error}")

@@ -1,8 +1,8 @@
 package vaid.project.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import vaid.project.R
 import vaid.project.adapter.RecyclerAdapter
+import vaid.project.model.Groups
 import vaid.project.ui.activities.MainActivity
 import vaid.project.utils.SessionUtil
 import vaid.project.viewmodels.LocationViewModel
@@ -42,7 +43,6 @@ class SearchFragment : BaseFragment() {
         searchView = view.findViewById(R.id.top_search_bar)
 
         viewModel.getAllUsers(SessionUtil(requireContext()).getPreference("userId"))
-
         return view
     }
 
@@ -52,15 +52,28 @@ class SearchFragment : BaseFragment() {
         viewModel.users.observe(viewLifecycleOwner){
             recyclerAdapter?.differ?.submitList(it)
         }
-        recyclerAdapter?.setOnButtonClickListener {
-            /*lifecycleScope.launch {
-                val user = viewModel.getUserData(SessionUtil(requireContext()).getPreference("userId")).await()
-                if(!user[0].groupsIDs?.contains(it.id)!!){
-                    Log.d("myLog", "onViewCreated: ${user[0].groupsIDs?.get(0)}")
-                    viewModel.addUserToGroup(user[0].groupsIDs?.get(0) ?: "", user[0].id!!)
-                }
-            }*/
 
+        val options = arrayListOf<String>()
+
+        viewModel.parentItems.observe(viewLifecycleOwner){
+           for(group in it){
+               options.add(group.title)
+           }
+        }
+        recyclerAdapter?.setOnButtonClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Выберете группу")
+                .setItems(options.toTypedArray()) { _, which ->
+                    val selectedOption = options[which]
+                    lifecycleScope.launch {
+                        val group = viewModel.getGroupByNameAndUserId(selectedOption, SessionUtil(requireContext()).getPreference("userId")).await()[0]
+                        group.groupUsers?.add(it.id.toString())
+                        viewModel.addUserToGroup(group.id, group)
+                        Log.d("myLog", "onViewCreated: $group")
+                    }
+                }
+                .setNegativeButton("Отмена") { dialog, _ -> dialog.cancel() }
+                .show()
         }
     }
 

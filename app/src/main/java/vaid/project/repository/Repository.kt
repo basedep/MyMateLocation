@@ -10,7 +10,6 @@ import vaid.project.model.User
 import vaid.project.utils.Constants.COLLECTION_GROUPS
 import vaid.project.utils.Constants.COLLECTION_USERS
 import vaid.project.utils.Constants.DATABASE_ID
-import java.util.UUID
 
 class Repository : AppwriteAPI {
 
@@ -53,8 +52,8 @@ class Repository : AppwriteAPI {
         return appwriteDatabase.listDocuments(DATABASE_ID, COLLECTION_USERS).documents
     }
 
-    override suspend fun addUserToGroup(groupId: String, userId: String) {
-        appwriteDatabase.updateDocument(DATABASE_ID, COLLECTION_GROUPS, groupId, listOf("groupUsers" to userId))
+    override suspend fun addUserToGroup(groupId: String, newGroupDocument: Groups) {
+        appwriteDatabase.updateDocument(DATABASE_ID, COLLECTION_GROUPS, groupId, newGroupDocument)
     }
 
     override suspend fun getAllGroups(userId: String): List<Document<Map<String, Any>>> {
@@ -65,6 +64,11 @@ class Repository : AppwriteAPI {
     override suspend fun getAllGroupsUsers(ids: List<String>): List<Document<Map<String, Any>>> {
         return appwriteDatabase.listDocuments(DATABASE_ID, COLLECTION_USERS,
             queries = listOf(Query.equal( "id", ids))).documents
+    }
+
+    override suspend fun getGroupByNameAndUserId(groupName: String, userId: String): List<Document<Map<String, Any>>> {
+        return appwriteDatabase.listDocuments(DATABASE_ID, COLLECTION_GROUPS,
+            queries = listOf(Query.search("groupName", groupName), Query.search("userID", userId))).documents
     }
 
 

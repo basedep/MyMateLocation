@@ -4,7 +4,6 @@ import io.appwrite.models.Document
 import io.appwrite.models.Session
 import vaid.project.model.Groups
 import vaid.project.model.User
-import vaid.project.utils.Result
 
 interface AppwriteAPI {
 
@@ -24,9 +23,12 @@ interface AppwriteAPI {
 
     suspend fun getAllUsers(): List<Document<Map<String, Any>>>
 
-    suspend fun addUserToGroup(groupId: String, userId: String)
+    suspend fun addUserToGroup(groupId: String, newGroupDocument: Groups)
 
     suspend fun getAllGroups(userId: String): List<Document<Map<String, Any>>>
 
     suspend fun getAllGroupsUsers(ids: List<String>): List<Document<Map<String, Any>>>
+
+    suspend fun getGroupByNameAndUserId(groupName: String, userId: String): List<Document<Map<String, Any>>>
+
 }

@@ -58,7 +58,6 @@ class GroupsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getAllGroups(SessionUtil(requireContext()).getPreference("userId"))
 
         viewModel.parentItems.observe(viewLifecycleOwner) {
             recyclerAdapter?.differ?.submitList(it)
@@ -84,8 +83,9 @@ class GroupsFragment : BaseFragment() {
                             val inputText = editText.text.toString()
 
                             if (inputText.isNotBlank()) {
-                                val group = Groups(SessionUtil(requireContext()).getPreference("userId"), null, inputText)
-                                viewModel.addGroup(UUID.randomUUID().toString(), group)
+                                val id = UUID.randomUUID().toString()
+                                val group = Groups(id, SessionUtil(requireContext()).getPreference("userId"), null, inputText)
+                                viewModel.addGroup(id, group)
                                 Toast.makeText(requireContext(), "Группа добавлена", Toast.LENGTH_SHORT).show()
                             }else
                                 Toast.makeText(requireContext(), "Пустое поле", Toast.LENGTH_SHORT).show()

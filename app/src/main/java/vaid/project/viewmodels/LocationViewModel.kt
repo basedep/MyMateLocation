@@ -44,7 +44,7 @@ class LocationViewModel(
             val id = UUID.randomUUID().toString()
             val groupId = UUID.randomUUID().toString()
             val user = User(id, name, 0.0, 0.0, listOf(groupId))
-            val group = Groups(id, null, "Users")
+            val group = Groups(groupId, id, null, "Users")
             repository.signup(id, name, email, password)
             repository.addUser(user, id)
             repository.addGroup(group, groupId)
@@ -82,6 +82,20 @@ class LocationViewModel(
         repository.addGroup(group, groupId)
     }
 
+    fun addUserToGroup(groupId: String, newGroupDocument: Groups) = viewModelScope.launch{
+        repository.addUserToGroup(groupId, newGroupDocument)
+    }
+
+    fun getGroupByNameAndUserId(name: String, userId: String) = viewModelScope.async{
+        val group = extractDataFromGroups(repository.getGroupByNameAndUserId(name, userId))
+        group
+    }
+
+    fun getGroupUsers(groupName: String, userId: String) = viewModelScope.async{
+        val group = extractDataFromGroups(repository.getGroupByNameAndUserId(groupName, userId))[0]
+        val users = extractData(repository.getAllGroupsUsers(group.groupUsers!!))
+        users
+    }
 
     fun getAllGroups(userId: String) = viewModelScope.launch{
         val groups = extractDataFromGroups(repository.getAllGroups(userId))
@@ -104,6 +118,7 @@ class LocationViewModel(
 
         parentItems.postValue(items)
     }
+
 
 
     private fun extractData(documents: List<Document<Map<String, Any>>>): List<User> {
