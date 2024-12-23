@@ -43,8 +43,16 @@ class ParentRecyclerAdapter()
         val adapter = ChildRecyclerAdapter(parentItem.childItemList)
         holder.childRecyclerView.adapter = adapter
 
-        //expandable
-        //val isExpandable = parentItem.isExpandable
-        //holder.childRecyclerView.visibility = if (isExpandable) View.VISIBLE else View.GONE
+        adapter.setOnMessageClickListener {
+            onMessageChildClickListener?.invoke(it)
+        }
+
+    }
+
+
+    private var onMessageChildClickListener: ((User) -> Unit)? = null
+
+    fun setOnMessageChildClickListener(listener: (User) -> Unit){
+        onMessageChildClickListener = listener
     }
 }

@@ -9,7 +9,11 @@
         android:id="@+id/groupsFragment"
         android:name="vaid.project.ui.fragments.GroupsFragment"
         android:label="fragment_groups"
-        tools:layout="@layout/fragment_groups" />
+        tools:layout="@layout/fragment_groups" >
+        <action
+            android:id="@+id/action_groupsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/mapFragment"
@@ -50,5 +54,14 @@
         <action
             android:id="@+id/action_signupFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="vaid.project.ui.fragments.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
+        <action
+            android:id="@+id/action_chatFragment_to_groupsFragment"
+            app:destination="@id/groupsFragment" />
     </fragment>
 </navigation>

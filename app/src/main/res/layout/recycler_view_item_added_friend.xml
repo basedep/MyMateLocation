@@ -30,6 +30,7 @@
             android:src="@drawable/message_24"
             android:layout_marginEnd="16dp"
             android:gravity="center"
+            android:backgroundTint="@color/black"
             android:importantForAccessibility="no" />
 
         <ImageButton
@@ -39,6 +40,7 @@
             android:src="@drawable/local_phone_24"
             android:layout_marginEnd="16dp"
             android:gravity="center"
+            android:backgroundTint="@color/black"
             android:importantForAccessibility="no" />
 
     </LinearLayout>

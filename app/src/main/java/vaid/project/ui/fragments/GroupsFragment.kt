@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import vaid.project.R
@@ -40,6 +41,7 @@ class GroupsFragment : BaseFragment() {
     private lateinit var viewModel: LocationViewModel
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,6 +60,11 @@ class GroupsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        recyclerAdapter?.setOnMessageChildClickListener {
+            val bundle = Bundle()
+            bundle.putSerializable("user", it)
+            findNavController().navigate(R.id.action_groupsFragment_to_chatFragment, bundle)
+        }
 
         viewModel.parentItems.observe(viewLifecycleOwner) {
             recyclerAdapter?.differ?.submitList(it)

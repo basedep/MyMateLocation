@@ -3,6 +3,7 @@ package vaid.project.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import vaid.project.R
@@ -13,6 +14,8 @@ class ChildRecyclerAdapter(private val listView: List<User>)
 
     inner class ChildViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val name: TextView = itemView.findViewById(R.id.itemNameAddedFriend)
+        val message: ImageButton = itemView.findViewById(R.id.itemMessage)
+        val dial: ImageButton = itemView.findViewById(R.id.itemDial)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChildViewHolder {
@@ -26,6 +29,14 @@ class ChildRecyclerAdapter(private val listView: List<User>)
         val childItem = listView[position]
 
         holder.name.text = childItem.name
+        holder.message.setOnClickListener {
+            onMessageClickListener?.invoke(childItem)
+        }
+    }
 
+    private var onMessageClickListener: ((User) -> Unit)? = null
+
+    fun setOnMessageClickListener(listener: (User) -> Unit){
+        onMessageClickListener = listener
     }
 }

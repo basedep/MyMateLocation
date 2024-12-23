@@ -2,7 +2,9 @@ package vaid.project.database.remote
 
 import io.appwrite.models.Document
 import io.appwrite.models.Session
+import vaid.project.model.Chat
 import vaid.project.model.Groups
+import vaid.project.model.Message
 import vaid.project.model.User
 
 interface AppwriteAPI {
@@ -30,5 +32,15 @@ interface AppwriteAPI {
     suspend fun getAllGroupsUsers(ids: List<String>): List<Document<Map<String, Any>>>
 
     suspend fun getGroupByNameAndUserId(groupName: String, userId: String): List<Document<Map<String, Any>>>
+
+    suspend fun getAllChatMessages(messageIds: List<String>): List<Document<Map<String, Any>>>
+
+    suspend fun getChat(firstId: String, secondId: String): List<Document<Map<String, Any>>>
+
+    suspend fun createChat(chatId: String, chat: Chat)
+
+    suspend fun updateChatMessages(chat: Chat)
+
+    suspend fun sendMessage(messageId: String, message: Message)
 
 }

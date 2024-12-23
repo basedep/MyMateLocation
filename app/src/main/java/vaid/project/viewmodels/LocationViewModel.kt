@@ -11,7 +11,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import vaid.project.location.DefaultLocationClient
+import vaid.project.model.Chat
 import vaid.project.model.Groups
+import vaid.project.model.Message
 import vaid.project.model.ParentItem
 import vaid.project.model.User
 import vaid.project.repository.Repository
@@ -26,6 +28,7 @@ class LocationViewModel(
     var location: MutableLiveData<Result<Location>> = MutableLiveData<Result<Location>>()
     var users: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     var parentItems: MutableLiveData<List<ParentItem>> = MutableLiveData<List<ParentItem>>()
+    var messages: MutableLiveData<List<Message>> = MutableLiveData<List<Message>>()
 
     init {
         getCurrentLocation()
@@ -97,6 +100,28 @@ class LocationViewModel(
         users
     }
 
+    fun createChat(chatId: String, chat: Chat) = viewModelScope.launch{
+        repository.createChat(chatId, chat)
+    }
+
+    fun getChat(firstId: String, secondId: String) = viewModelScope.async {
+        val chat = extractChatData(repository.getChat(firstId, secondId))
+        chat
+    }
+
+    fun getAllChatMessages(messageIds: List<String>) = viewModelScope.launch{
+        val chatMessages = extractChatMessages(repository.getAllChatMessages(messageIds))
+        messages.postValue(chatMessages)
+    }
+
+    fun sendMessage(messageId: String, message: Message) = viewModelScope.launch {
+        repository.sendMessage(messageId, message)
+    }
+
+    fun updateChatMessages(chat: Chat) = viewModelScope.launch{
+        repository.updateChatMessages(chat)
+    }
+
     fun getAllGroups(userId: String) = viewModelScope.launch{
         val groups = extractDataFromGroups(repository.getAllGroups(userId))
         val items: MutableList<ParentItem> = mutableListOf()
@@ -137,6 +162,37 @@ class LocationViewModel(
         return dataList
     }
 
+    private fun extractChatData(documents: List<Document<Map<String, Any>>>): List<Chat> {
+        val gson = Gson()
+        val dataList = mutableListOf<Chat>()
+
+        for (document in documents) {
+            val dataMap: Map<String, Any> = document.toMap()
+            val json = gson.toJson(dataMap["data"])
+
+            val data: Chat = gson.fromJson(json, Chat::class.java)
+
+            dataList.add(data)
+        }
+
+        return dataList
+    }
+
+    private fun extractChatMessages(documents: List<Document<Map<String, Any>>>): List<Message> {
+        val gson = Gson()
+        val dataList = mutableListOf<Message>()
+
+        for (document in documents) {
+            val dataMap: Map<String, Any> = document.toMap()
+            val json = gson.toJson(dataMap["data"])
+
+            val data: Message = gson.fromJson(json, Message::class.java)
+
+            dataList.add(data)
+        }
+
+        return dataList
+    }
 
     private fun extractDataFromGroups(documents: List<Document<Map<String, Any>>>): List<Groups> {
         val gson = Gson()
